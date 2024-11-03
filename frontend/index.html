@@ -1,40 +1,68 @@
 <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Image Upload</title>
-        <style>
-            body { font-family: Arial, sans-serif; }
-            form { margin-bottom: 20px; }
-            #result { margin-top: 20px; }
-        </style>
-    </head>
-    <body>
-        <h1>Upload an Image</h1>
-        <form id="uploadForm">
-            <input name="file" type="file" accept="image/*" required>
-            <button type="submit">Upload Image</button>
-        </form>
-        <div id="result"></div>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Upload</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        form { margin-bottom: 20px; }
+        #result { margin-top: 20px; }
+        #preview { max-width: 300px; margin-top: 20px; border: 1px solid #000000; }
+    </style>
+</head>
+<body bgcolor="gray">
+    <h1>Upload an Image</h1>
+    <form id="uploadForm">
+        <input name="file" type="file" accept="image/*" required onchange="previewImage(event)">
+        <button type="submit">Predict Image</button>
+    </form>
+    <div>
+        <h2>Image Preview:</h2>
+        <img id="preview" alt="Image Preview" style="display: none;">
+    </div>
+    <div id="result"></div>
 
-        <script>
-            document.getElementById('uploadForm').onsubmit = async function(event) {
-                event.preventDefault();
-                const formData = new FormData(this);
-                const response = await fetch('http://127.0.0.1:8080/predict', {
+    <script>
+        function previewImage(event) {
+            const file = event.target.files[0];
+            const preview = document.getElementById('preview');
+            
+            if (file) {
+                const imageURL = URL.createObjectURL(file);
+                preview.src = imageURL;
+                preview.style.display = 'block';
+            }
+        }
+
+        document.getElementById('uploadForm').onsubmit = async function(event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+            
+            try {
+                const response = await fetch('http://127.0.0.1:8000/predict', {
                     method: 'POST',
                     body: formData
                 });
+                
+                if (!response.ok) {
+                    throw new Error("Failed to fetch prediction.");
+                }
+
                 const result = await response.json();
                 document.getElementById('result').innerHTML = `
                     <h2>Detection Results:</h2>
+                    <p><strong>Class:</strong> ${result.predicted_class}</p>
+                    <p><strong>Confidence:</strong> ${result.accuracy}</p>
                     <p><strong>Filename:</strong> ${result.filename}</p>
-                    <p><strong>Width:</strong> ${result.width}</p>
-                    <p><strong>Height:</strong> ${result.height}</p>
+                    <p><strong>Width:</strong> ${result.width} px</p>
+                    <p><strong>Height:</strong> ${result.height} px</p>
                     <p><strong>Mode:</strong> ${result.mode}</p>
                 `;
+            } catch (error) {
+                document.getElementById('result').innerHTML = `<p>Error: ${error.message}</p>`;
             }
-        </script>
-    </body>
-    </html>
+        }
+    </script>
+</body>
+</html>
