@@ -1,9 +1,9 @@
 import io
-from fastapi import FastAPI, File, UploadFile
-from fastapi.middleware.cors import CORSMiddleware
+from fastapi import FastAPI, File, UploadFile # type: ignore
+from fastapi.middleware.cors import CORSMiddleware # type: ignore
 from PIL import Image
 
-from helper import detect_image
+from helper import details, predict_image
 
 app = FastAPI()
 
@@ -11,7 +11,6 @@ origins = [
     "http://127.0.0.1:5500",  
 ]
 
-# Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,  
@@ -20,23 +19,28 @@ app.add_middleware(
     allow_headers=["*"],  
 )
 
-# Define a home route
-@app.get("/home")
-async def home():
-    return {"hi": "I am ok"}
-
 @app.get("/")
 async def root():
     return{"msg":"This is root route"}
 
 
+@app.get("/home")
+async def home():
+    return {"msg": "Hi! I am home"}
+
+
+
 @app.post("/predict")
 async def upload_image(file: UploadFile = File(...)):
-    # Read the image file
     image_data = await file.read()
     image = Image.open(io.BytesIO(image_data))
 
-    # Call your image detection function
-    result = detect_image(image)
+    im_details = details(image)
 
-    return {"filename": file.filename, **result}
+    pred = predict_image(image)
+
+    return {
+        "filename":file.filename,
+        **pred,
+        **im_details
+    }
