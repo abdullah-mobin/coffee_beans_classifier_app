@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -70,6 +71,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <div class="sidebar">
@@ -81,7 +83,8 @@
                 <a href="http://localhost:3000/models" style="text-decoration: none; color: inherit;">Models</a>
             </div>
             <div class="menu-item">
-                <a href="http://localhost:3000/models" style="text-decoration: none; color: inherit;">Detection History</a>
+                <a href="http://localhost:3000/models" style="text-decoration: none; color: inherit;">Detection
+                    History</a>
             </div>
             <div class="menu-item">
                 <a href="http://localhost:3000/about" style="text-decoration: none; color: inherit;">About</a>
@@ -91,17 +94,36 @@
             </div>
         </div>
         <div class="main-content">
-            <h2>Detection Result</h2>
-            <p id="resultText">Loading...</p>
+            <div class="result-content">
+                <h2>Detection Result</h2>
+                <p id="resultText">Loading...</p>
+                <button class="back-btn" onclick="window.location.href='http://localhost:3000'">Go Back</button>
+            </div>
         </div>
     </div>
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             const resultText = document.getElementById("resultText");
+            
+            // Check what is stored in localStorage
             const detectionResult = JSON.parse(localStorage.getItem("detectionResult"));
-            resultText.textContent = detectionResult ? detectionResult.result : "No result found.";
+            console.log(detectionResult); // Debugging line to see what is stored in localStorage
+    
+            if (detectionResult) {
+                resultText.innerHTML = `
+                    <strong>Predicted Class:</strong> ${detectionResult.predicted_class}<br>
+                    <strong>Confidence:</strong> ${detectionResult.accuracy}<br>
+                    <strong>Filename:</strong> ${detectionResult.filename}<br>
+                    <strong>Width:</strong> ${detectionResult.width} px<br>
+                    <strong>Height:</strong> ${detectionResult.height} px<br>
+                    <strong>Mode:</strong> ${detectionResult.mode}
+                `;
+            } else {
+                resultText.textContent = "No result found.";
+            }
         });
     </script>
 </body>
+
 </html>
