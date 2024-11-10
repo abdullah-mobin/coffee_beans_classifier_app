@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Models - Coffee Bean Roast Classifier</title>
+    <style>
+        /* Reuse sidebar styles */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5d3d3;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            width: 700px;
+            height: 500px;
+            background-color: #f5c6c6;
+            border: 2px solid #e28b8b;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: row;
+            padding: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar {
+            width: 30%;
+            background-color: #f2b4b4;
+            border-radius: 10px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .footer {
+            font-size: 14px;
+            color: #5f3535;
+            text-align: center;
+            margin-top: auto;  /* Push footer to the bottom */
+            padding-top: 10px;
+        }
+
+
+        .sidebar h2 {
+            margin: 0;
+            font-size: 18px;
+            color: #5f3535;
+            text-align: center;
+        }
+
+        .menu-item {
+            width: 80%;
+            padding: 10px;
+            margin: 10px 0;
+            background-color: #add8e6;
+            color: #2f2d5b;
+            text-align: center;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .menu-item:hover {
+            background-color: #6fa2c6;
+        }
+
+        /* Content Section */
+        .main-content {
+            width: 70%;
+            background-color: #e8e2d2;
+            border-radius: 10px;
+            margin-left: 10px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            height: 100%;
+            box-sizing: border-box;
+        }
+
+        .history-description {
+            font-size: 18px;
+            color: #2f2d5b;
+        }
+
+        .history-title {
+            font-size: 32px;
+            font-weight: bold;
+            color: #5f3535;
+        }
+
+        .model-link {
+            font-size: 18px;
+            color: #0056b3;
+            text-decoration: none;
+            margin-top: 10px;
+        }
+
+        .model-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar (same as before) -->
+        <div class="sidebar">
+            <h2>Coffee Bean Roast Classifier</h2>
+            <div class="menu-item">
+                <a href="D:\mahi\coffee_beans_classifier_app\frontend\home.html" style="text-decoration: none; color: inherit;">Home</a>
+            </div>
+            <div class="menu-item">
+                <a href="D:\mahi\coffee_beans_classifier_app\frontend\models.html" style="text-decoration: none; color: inherit;">Models</a>
+            </div>
+            <div class="menu-item">Detection History</div>
+            <div class="menu-item">
+                <a href="D:\mahi\coffee_beans_classifier_app\frontend\about.html" style="text-decoration: none; color: inherit;">About</a>
+            </div>
+            <div class="footer">
+                2024 Coffee Bean Roast Classifier. All rights reserved.
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="history-description">
+                <div class="history-title">Origin of the Coffee Bean Roast Classifier</div>
+                <div>
+                    The Coffee Bean Roast Classifier was established in 2024 as a powerful tool to help identify and classify coffee beans based on their roast level. With the growing demand for coffee quality assessment, this classifier uses deep learning models to analyze the appearance of coffee beans and determine their roast grade with high accuracy.
+                </div>
+                <div>
+                    The project began with the goal of providing a practical solution for coffee roasters, suppliers, and enthusiasts to evaluate the roast level of beans, assisting in product quality control and consistency.
+                </div>
+            </div>
+
+            <div class="history-description">
+                <a href="about.html" class="model-link">Learn more about the models used in this classifier</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
