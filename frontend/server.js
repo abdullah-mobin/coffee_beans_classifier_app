@@ -22,16 +22,6 @@ app.get('/models', (req, res) => {
     res.sendFile(path.join(__dirname, 'models.html'));
 });
 
-// Route for the Result Page (result.html)
-app.get('/result', (req, res) => {
-    res.sendFile(path.join(__dirname, 'result.html'));
-});
-
-// Route for the API Page (api.html)
-app.get('/api', (req, res) => {
-    res.sendFile(path.join(__dirname, 'api.html'));
-});
-
 // Start the server
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);

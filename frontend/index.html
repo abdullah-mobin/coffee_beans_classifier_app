@@ -71,6 +71,7 @@
             background-color: #6fa2c6;
         }
 
+
         .main-content {
             width: 70%;
             background-color: #e8e2d2;
@@ -83,6 +84,26 @@
             justify-content: center;
             position: relative;
             box-sizing: border-box;
+        }
+
+        .result-content {
+            width: 70%;
+            background-color: #e8e2d2;
+            border-radius: 10px;
+            margin-left: 10px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-sizing: border-box;
+        }
+
+        .scrollable-content {
+            width: 100%;
+            height: 400px;
+            overflow-y: scroll;
         }
 
         .upload-box {
@@ -132,6 +153,7 @@
             /* Keep it above the preview image to allow re-upload */
         }
 
+        .return-btn,
         .detect-btn,
         .model-btn {
             margin-top: 20px;
@@ -145,6 +167,11 @@
         .detect-btn {
             background-color: #77dd77;
             color: #245324;
+        }
+
+        .return-btn {
+            background-color: #ff6961;
+            color: white;
         }
 
         .model-btn {
@@ -209,7 +236,8 @@
         </div>
 
         <!-- Main Content -->
-        <div class="main-content">
+        <div class="main-content" id="mainContent">
+
             <!-- Updated Upload Box with File Input and Preview -->
             <label class="upload-box">
                 <div class="upload-text">+ Upload Image</div>
@@ -228,10 +256,25 @@
                     <a href="#" onclick="selectModel('Xception'); event.stopPropagation();">Xception</a>
                 </div>
             </div>
+            <!-- Result Content (Hidden initially) -->
+
         </div>
+        <div class="result-content" id="resultContent" style="display: none;">
+            <div class="scrollable-content">
+                <h2>Detection Result</h2>
+
+                <img id="resultImage" alt="Detected Image" style="max-width: 100%; border-radius: 10px;">
+                <!-- <pre id="resultText" ></pre> -->
+                <div id="resultData" style="background-color: #f0f0f0; padding: 10px; border-radius: 10px;"></div>
+                
+            </div><button class="return-btn" onclick="resetMainContent()">Back to Upload</button>
+        </div>
+
+
+
     </div>
 
-    <script>
+    <!-- <script>
         let uploadedFile = null;
 
         function previewImage(event) {
@@ -274,13 +317,13 @@
                 const result = await response.json();
                 console.log(result);
                 console.log('Before saving to localStorage:', result);
-                
+
                 localStorage.setItem('detectionResult', JSON.stringify(result)); // Save the result to localStorage
                 window.location.replace = 'http://127.0.0.1:3000/result'; // Redirect to result page
 
                 console.log('After saving to localStorage:', localStorage.getItem('detectionResult'));
 
-                 // Debugging line to ensure you're getting the correct data
+                // Debugging line to ensure you're getting the correct data
             } catch (error) {
                 alert("Error: " + error.message);
             }
@@ -306,7 +349,119 @@
                 document.getElementById("dropdown").style.display = "none";
             }
         });
+    </script> -->
+
+    <script>
+        let uploadedFile = null;
+        let modelName = ""
+
+        function previewImage(event) {
+            const file = event.target.files[0];
+            const preview = document.getElementById('preview');
+            const uploadText = document.querySelector('.upload-text');
+
+            if (file) {
+                uploadedFile = file;
+                console.log("File selected:", uploadedFile);
+
+                const imageURL = URL.createObjectURL(file);
+                preview.src = imageURL;
+                preview.style.display = 'block';
+                uploadText.style.display = 'none';
+            } else {
+                console.log("No file selected");
+            }
+        }
+
+        async function handleDetection() {
+            if (!uploadedFile) {
+                alert("Please upload an image first!");
+                return;
+            }
+            selectedModelName = modelName.toLowerCase()
+
+            const formData = new FormData();
+            formData.append('file', uploadedFile);
+            formData.append('model', selectedModelName);
+
+            try {
+                const response = await fetch('http://127.0.0.1:8000/predict', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error("Failed to LOL prediction.");
+                }
+
+                const result = await response.json();
+                console.log(result);
+
+                // Display the result content
+                showResult(result);
+            } catch (error) {
+                alert("Error: " + error.message);
+            }
+        }
+
+        function showResult(result) {
+            // Hide the main content and show the result content
+            document.getElementById('mainContent').style.display = 'none';
+            const resultContent = document.getElementById('resultContent');
+            resultContent.style.display = 'flex';
+            resultContent.style.flexDirection = 'column';
+            resultContent.style.alignItems = 'center';
+
+            // Set the result image
+            const resultImage = document.getElementById('resultImage');
+            const imageURL = URL.createObjectURL(uploadedFile);
+            resultImage.src = imageURL;
+
+            // Display the JSON response
+            // const resultText = document.getElementById('resultText');
+            // resultText.textContent = JSON.stringify(result, null, 2);
+            document.getElementById('resultData').innerHTML = `
+                    <p><b>Class:</b> ${result.predicted_class}</p>
+                    <p><b>Accuracy:</b> ${result.accuracy}</p>
+                    <p><b>Image description:</b> ${result.width} x ${result.height} px ${result.mode} Image of ${result.predicted_class}</p>
+                    <p><b>Coffee Details:</b> ${result.coffee_details}</p>
+                    <p><b>Classification model details:</b> ${result.modedl_details}</p>
+                `;
+        }
+
+        function resetMainContent() {
+            // Reset the view to the main content
+            document.getElementById('mainContent').style.display = 'flex';
+            document.getElementById('resultContent').style.display = 'none';
+
+            // Clear the uploaded file and preview image
+            uploadedFile = null;
+            const preview = document.getElementById('preview');
+            preview.src = '';
+            preview.style.display = 'none';
+            document.querySelector('.upload-text').style.display = 'block';
+        }
+
+        function toggleDropdown() {
+            const dropdown = document.getElementById("dropdown");
+            dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
+        }
+
+        function selectModel(model) {
+            document.getElementById("selectedModelText").textContent = modelName;
+            modelName = model;
+            console.log("Selected model: " + modelName);
+            toggleDropdown();
+        }
+        // Close dropdown if clicked outside
+        document.addEventListener('click', function (event) {
+            const isClickInside = document.getElementById("modelButton").contains(event.target);
+            if (!isClickInside) {
+                document.getElementById("dropdown").style.display = "none";
+            }
+        });
     </script>
+
 </body>
 
 </html>
