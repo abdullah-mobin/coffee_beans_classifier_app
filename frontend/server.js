@@ -22,7 +22,11 @@ app.get('/models', (req, res) => {
     res.sendFile(path.join(__dirname, 'models.html'));
 });
 
+app.get('/history', (req, res) => {
+    res.sendFile(path.join(__dirname, 'history.html'));
+});
+
 // Start the server
 app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}`);
+    console.log(`Server running at http://192.168.1.102:${port}`);
 });

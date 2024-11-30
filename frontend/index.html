@@ -6,6 +6,37 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Coffee Bean Roast Classifier</title>
     <style>
+
+        .model-btn:hover {
+            background-color: #9c0d0d;
+        }
+
+        #selectedModelText {
+            font-weight: bold;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #ffffff;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .dropdown-content a {
+            color: black;
+            padding: 10px 16px;
+            text-decoration: none;
+            display: block;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #eb1212;
+        }
+
         body {
             font-family: Arial, sans-serif;
             background-color: #f5d3d3;
@@ -218,17 +249,17 @@
         <div class="sidebar">
             <h2>Coffee Bean Roast Classifier</h2>
             <div class="menu-item">
-                <a href="http://localhost:3000/" style="text-decoration: none; color: inherit;">Home</a>
+                <a href="http://192.168.1.102:3000/" style="text-decoration: none; color: inherit;">Home</a>
             </div>
             <div class="menu-item">
-                <a href="http://localhost:3000/models" style="text-decoration: none; color: inherit;">Models</a>
+                <a href="http://192.168.1.102:3000/models" style="text-decoration: none; color: inherit;">Models</a>
             </div>
             <div class="menu-item">
-                <a href="http://localhost:3000/models" style="text-decoration: none; color: inherit;">Detection
+                <a href="http://192.168.1.102:3000/history" style="text-decoration: none; color: inherit;">Detection
                     History</a>
             </div>
             <div class="menu-item">
-                <a href="http://localhost:3000/about" style="text-decoration: none; color: inherit;">About</a>
+                <a href="http://192.168.1.102:3000/about" style="text-decoration: none; color: inherit;">About</a>
             </div>
             <div class="footer">
                 2024 Coffee Bean Roast Classifier. All rights reserved.
@@ -256,6 +287,7 @@
                     <a href="#" onclick="selectModel('Xception'); event.stopPropagation();">Xception</a>
                 </div>
             </div>
+
             <!-- Result Content (Hidden initially) -->
 
         </div>
@@ -266,7 +298,7 @@
                 <img id="resultImage" alt="Detected Image" style="max-width: 100%; border-radius: 10px;">
                 <!-- <pre id="resultText" ></pre> -->
                 <div id="resultData" style="background-color: #f0f0f0; padding: 10px; border-radius: 10px;"></div>
-                
+
             </div><button class="return-btn" onclick="resetMainContent()">Back to Upload</button>
         </div>
 
@@ -274,86 +306,11 @@
 
     </div>
 
-    <!-- <script>
-        let uploadedFile = null;
 
-        function previewImage(event) {
-            const file = event.target.files[0];
-            const preview = document.getElementById('preview');
-            const uploadText = document.querySelector('.upload-text');
-
-            if (file) {
-                uploadedFile = file;  // Update the uploadedFile variable with the selected file
-                console.log("File selected:", uploadedFile);  // Debugging line to confirm the file is selected
-
-                const imageURL = URL.createObjectURL(file);
-                preview.src = imageURL;
-                preview.style.display = 'block';
-                uploadText.style.display = 'none';  // Hide the "+ Upload Image" text
-            } else {
-                console.log("No file selected");  // Debugging line if no file is selected
-            }
-        }
-
-        async function handleDetection() {
-            if (!uploadedFile) {
-                alert("Please upload an image first!");
-                return;
-            }
-
-            const formData = new FormData();
-            formData.append('file', uploadedFile);
-
-            try {
-                const response = await fetch('http://127.0.0.1:8000/predict', {
-                    method: 'POST',
-                    body: formData
-                });
-
-                if (!response.ok) {
-                    throw new Error("Failed to fetch prediction.");
-                }
-
-                const result = await response.json();
-                console.log(result);
-                console.log('Before saving to localStorage:', result);
-
-                localStorage.setItem('detectionResult', JSON.stringify(result)); // Save the result to localStorage
-                window.location.replace = 'http://127.0.0.1:3000/result'; // Redirect to result page
-
-                console.log('After saving to localStorage:', localStorage.getItem('detectionResult'));
-
-                // Debugging line to ensure you're getting the correct data
-            } catch (error) {
-                alert("Error: " + error.message);
-            }
-        }
-
-
-
-
-        function toggleDropdown() {
-            const dropdown = document.getElementById("dropdown");
-            dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
-        }
-
-        function selectModel(modelName) {
-            document.getElementById("selectedModelText").textContent = modelName;
-            toggleDropdown();  // Close the dropdown after selection
-        }
-
-        // Close dropdown if clicked outside
-        document.addEventListener('click', function (event) {
-            const isClickInside = document.getElementById("modelButton").contains(event.target);
-            if (!isClickInside) {
-                document.getElementById("dropdown").style.display = "none";
-            }
-        });
-    </script> -->
 
     <script>
         let uploadedFile = null;
-        let modelName = ""
+        let mName = ""
 
         function previewImage(event) {
             const file = event.target.files[0];
@@ -378,14 +335,14 @@
                 alert("Please upload an image first!");
                 return;
             }
-            selectedModelName = modelName.toLowerCase()
+            selectedModelName = mName.toLowerCase()
 
             const formData = new FormData();
             formData.append('file', uploadedFile);
             formData.append('model', selectedModelName);
 
             try {
-                const response = await fetch('http://127.0.0.1:8000/predict', {
+                const response = await fetch('http://192.168.1.102:8000/predict', {
                     method: 'POST',
                     body: formData
                 });
@@ -442,24 +399,31 @@
             document.querySelector('.upload-text').style.display = 'block';
         }
 
+        // Function to toggle the dropdown visibility
         function toggleDropdown() {
-            const dropdown = document.getElementById("dropdown");
-            dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
+            const dropdown = document.getElementById('dropdown');
+            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
         }
 
-        function selectModel(model) {
-            document.getElementById("selectedModelText").textContent = modelName;
-            modelName = model;
-            console.log("Selected model: " + modelName);
-            toggleDropdown();
+        // Function to handle model selection
+        function selectModel(modelName) {
+            const selectedModelText = document.getElementById('selectedModelText');
+            selectedModelText.textContent = modelName; // Update the displayed text
+            console.log(`Selected model: ${modelName}`); // Log the selected model
+            mName = modelName
+            // Hide the dropdown after selection
+            const dropdown = document.getElementById('dropdown');
+            dropdown.style.display = 'none';
         }
+
         // Close dropdown if clicked outside
-        document.addEventListener('click', function (event) {
-            const isClickInside = document.getElementById("modelButton").contains(event.target);
-            if (!isClickInside) {
-                document.getElementById("dropdown").style.display = "none";
+        window.onclick = function (event) {
+            const dropdown = document.getElementById('dropdown');
+            if (!event.target.matches('.model-btn') && !event.target.matches('.dropdown-content a')) {
+                dropdown.style.display = 'none';
             }
-        });
+        };
+
     </script>
 
 </body>

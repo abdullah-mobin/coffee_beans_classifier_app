@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Models - Coffee Bean Roast Classifier</title>
     <style>
-        /* Reuse sidebar styles */
         body {
             font-family: Arial, sans-serif;
             background-color: #f5d3d3;
@@ -44,10 +43,8 @@
             color: #5f3535;
             text-align: center;
             margin-top: auto;
-            /* Push footer to the bottom */
             padding-top: 10px;
         }
-
 
         .sidebar h2 {
             margin: 0;
@@ -67,12 +64,10 @@
             cursor: pointer;
             transition: background 0.3s;
         }
-
         .menu-item:hover {
             background-color: #6fa2c6;
         }
 
-        /* Content Section */
         .main-content {
             width: 70%;
             background-color: #e8e2d2;
@@ -100,22 +95,35 @@
             color: #5f3535;
         }
 
-        .model-link {
-            font-size: 18px;
-            color: #0056b3;
-            text-decoration: none;
-            margin-top: 10px;
+        .history {
+            height: 600px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+            background-color: #ffffff;
+            border-radius: 5px;
         }
 
-        .model-link:hover {
-            text-decoration: underline;
+        .history-item {
+            height: 70px;
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 10px;
+            background-color: #f9f9f9;
+        }
+
+        .history-item img {
+            border-radius: 10px;
+            margin-right: 20px;
         }
     </style>
 </head>
 
 <body>
     <div class="container">
-        <!-- Sidebar (same as before) -->
         <div class="sidebar">
             <h2>Coffee Bean Roast Classifier</h2>
             <div class="menu-item">
@@ -136,28 +144,59 @@
             </div>
         </div>
 
-        <!-- Main Content -->
         <div class="main-content">
-            <div class="history-description">
-                <div class="history-title">Origin of the Coffee Bean Roast Classifier</div> </br></br></br>
-                <div>
-                    The Coffee Bean Roast Classifier was established in 2024 as a powerful tool to help identify and
-                    classify coffee beans based on their roast level. With the growing demand for coffee quality
-                    assessment, this classifier uses deep learning models to analyze the appearance of coffee beans and
-                    determine their roast grade with high accuracy.
-                </div>
-                <div>
-                    The project began with the goal of providing a practical solution for coffee roasters, suppliers,
-                    and enthusiasts to evaluate the roast level of beans, assisting in product quality control and
-                    consistency.
-                </div>
+            <div class="history-title">Coffee Bean Roast Classification History</div>
+            <hr>
+            <div class="history">
             </div>
             </br>
-            <div class="history-description">
-                <a href="https://github.com/abdullah-mobin/coffee-beans-classification" class="model-link">Learn more about the models used in this classifier</a>
-            </div>
         </div>
     </div>
+
+
+    <script>
+        async function fetchHistory() {
+            try {
+                const response = await fetch('http://192.168.1.102:8000/history'); 
+                const data = await response.json();
+                const historyDiv = document.querySelector('.history');
+
+                data.images.forEach(entry => {
+                    const historyItem = document.createElement('div');
+                    historyItem.classList.add('history-item');
+                    historyItem.style.display = "flex";
+                    historyItem.style.alignItems = "center";
+                    historyItem.style.marginBottom = "20px";
+                    historyItem.style.border = "1px solid #ccc";
+                    historyItem.style.padding = "10px";
+                    historyItem.style.borderRadius = "10px";
+                    historyItem.style.backgroundColor = "#f9f9f9";
+
+                    const imageSrc = `http://192.168.1.102:8000/image/view/${entry.file_id}`;
+                    historyItem.innerHTML = `
+                <img src="${imageSrc}" 
+                     alt="Image" 
+                     style="width:70px;height:70px;object-fit:cover;margin-right:20px;">
+                <div>
+                    <span><strong>Class:</strong> ${entry.metadata.predicted_class || "Unknown"}</span><br>
+                    <span><strong>Model:</strong> ${entry.metadata.model || "Unknown"}</span><br>
+                    <span><strong>Accuracy:</strong> ${Math.round(entry.metadata.accuracy * 100) || "N/A"} %</span><br>
+                    <span><strong>Time:</strong> ${entry.metadata.timestamp ? new Date(entry.metadata.timestamp).toLocaleString() : "N/A"}</span>
+                </div>
+            `;
+
+                    historyDiv.appendChild(historyItem);
+                });
+            } catch (error) {
+                console.error('Error fetching history:', error);
+                const errorDiv = document.querySelector('.history');
+                errorDiv.innerHTML = `<div style="color: red;">Failed to load history data.</div>`;
+            }
+        }
+
+        window.onload = fetchHistory;
+    </script>
+
 </body>
 
 </html>
